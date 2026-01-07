@@ -12,6 +12,7 @@ import {
   Fade,
 } from '@mui/material';
 import { Folder as FolderIcon, Login as LoginIcon } from '@mui/icons-material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
 const LoginPage = ({ navigate }) => {
   const [email, setEmail] = useState('');
@@ -161,7 +162,7 @@ const LoginPage = ({ navigate }) => {
           </Box>
         </Paper>
       </Container>
-    </Box>
+    </Box>     
   );
 };
 

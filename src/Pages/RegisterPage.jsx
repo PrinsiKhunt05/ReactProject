@@ -15,7 +15,16 @@ import {
   Folder as FolderIcon,
   PersonAdd as PersonAddIcon,
 } from '@mui/icons-material';
-
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const RegisterPage = ({ navigate }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -23,7 +32,7 @@ const RegisterPage = ({ navigate }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -66,6 +75,49 @@ const RegisterPage = ({ navigate }) => {
     }, 500);
   };
 
+  const [list,setList] = useState([])
+
+    const token = "fdIowwXOCAV8Jlum"
+
+    useEffect(() =>{
+        console.log("prinsi");
+        dataview()
+    },[])
+
+    function dataview()
+    {
+        axios.get('https://generateapi.techsnack.online/api/ProjectFair' , {
+            headers : {
+                Authorization : token
+            }
+        })
+        .then((res) =>{
+            console.log(res.data.Data);
+            setList(res.data.Data)
+        })
+        .catch((error) =>{
+            console.log(error);
+        })
+    }
+
+    const DeleteData = (id) =>{
+      axios.delete(`https://generateapi.techsnack.online/api/ProjectFair/${id}`,{
+        headers : {
+          Authorization : token
+        }
+      })
+      .then(() =>{
+        // console.log("Success");
+        toast("Success")
+        dataview()
+      })
+      .catch((error) =>{
+          console.log("Error");
+      })
+    }
+    
+
+
   return (
     <Box
       sx={{
@@ -83,6 +135,7 @@ const RegisterPage = ({ navigate }) => {
           sx={{
             p: 3,
             borderRadius: 3,
+            marginTop: 5,
             width: '100%',
           }}
         >
@@ -195,6 +248,35 @@ const RegisterPage = ({ navigate }) => {
             </Typography>
           </Box>
         </Paper>
+        
+        <br /><br />
+        <TableContainer component={Paper} sx={{marginBottom:"30px"}}>
+            <Table aria-label="simple table">
+                <TableHead>
+                    <TableRow>
+                        <TableCell>FullName</TableCell>
+                        <TableCell>Email</TableCell>
+                        <TableCell>Password</TableCell>
+                        <TableCell>Delete</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {
+                        list.map((i) =>(
+                            <TableRow>
+                                <TableCell>{i.FullName}</TableCell>
+                                <TableCell>{i.Email}</TableCell>
+                                <TableCell>{i.Password}</TableCell>
+                                <TableCell>
+                                  <Button onClick={() => DeleteData(i._id)}>Delete</Button>
+                                </TableCell>
+                            </TableRow>
+                        ))
+                    }
+                </TableBody>
+            </Table>
+        </TableContainer>
+        <ToastContainer />
       </Container>
     </Box>
   );
