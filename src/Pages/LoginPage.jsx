@@ -12,13 +12,16 @@ import {
   Fade,
 } from '@mui/material';
 import { Folder as FolderIcon, Login as LoginIcon } from '@mui/icons-material';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = ({ navigate }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const token = "fdIowwXOCAV8Jlum";
 
   useEffect(() => {
     if (localStorage.getItem('currentUser')) {
@@ -37,24 +40,39 @@ const LoginPage = ({ navigate }) => {
     setIsLoading(true);
     setError('');
 
-    setTimeout(() => {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
+    axios.get('https://generateapi.techsnack.online/api/ProjectFair', {
+      headers: {
+        Authorization: token
+      }
+    })
+    .then((res) => {
+      const users = res.data.Data;
       const user = users.find(
-        (u) => u.email === email && u.password === password
+        (u) => u.Email === email && u.Password === password
       );
 
       if (user) {
-        const { password, ...userWithoutPassword } = user;
+        const { Password, ...userWithoutPassword } = user;
         localStorage.setItem(
           'currentUser',
           JSON.stringify(userWithoutPassword)
         );
-        navigate('/dashboard');
+        toast.success("Login Successful!");
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
       } else {
         setError('Invalid email or password');
+        toast.error("Invalid email or password");
         setIsLoading(false);
       }
-    }, 500);
+    })
+    .catch((error) => {
+      console.log(error);
+      setError('Login failed. Please try again.');
+      toast.error("Login Failed!");
+      setIsLoading(false);
+    });
   };
 
   return (
@@ -151,7 +169,7 @@ const LoginPage = ({ navigate }) => {
               sx={{ mt: 2 }}
               color="text.secondary"
             >
-              Don’t have an account?{' '}
+              Don't have an account?{' '}
               <Button
                 onClick={() => navigate('/register')}
                 sx={{ textTransform: 'none', fontWeight: 600 }}
@@ -161,6 +179,7 @@ const LoginPage = ({ navigate }) => {
             </Typography>
           </Box>
         </Paper>
+        <ToastContainer />
       </Container>
     </Box>     
   );
